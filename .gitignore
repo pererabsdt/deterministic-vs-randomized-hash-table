@@ -1,0 +1,29 @@
+# CMake and build artifacts
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+*.cmake
+compile_commands.json
+
+# Compiled binaries and libraries (Windows & Linux/macOS)
+*.exe
+*.dll
+*.lib
+*.so
+*.a
+*.dylib
+*.o
+*.out
+experiment
+
+# IDEs and OS artifacts
+.vscode/
+.vs/
+.idea/
+.DS_Store
+
+# Output files
+*.csv
+*.png
