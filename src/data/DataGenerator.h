@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+const std::string CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
 class DataGenerator {
 public:
     // Generates a dataset of random alphanumeric strings
