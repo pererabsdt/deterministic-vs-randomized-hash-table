@@ -14,7 +14,8 @@ vector<string> DataGenerator::generateBenignData(size_t size, size_t length) {
     
     for(size_t i = 0 ; i< size;i++){
         string random_string;
-        for(int j=0; i< length; i++){
+        random_string.reserve(length);
+        for (size_t j = 0; j < length; ++j) {
             random_string += CHARACTERS[distribution(generator)];
         }
         dataset.push_back(random_string);
