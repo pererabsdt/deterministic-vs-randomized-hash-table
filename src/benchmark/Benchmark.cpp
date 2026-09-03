@@ -1,4 +1,4 @@
-#include "benchmark/Benchmark.h"
+#include "Benchmark.h"
 #include "hash/HashTableV1.h"
 #include "hash/HashTableV2.h"
 #include <iostream>

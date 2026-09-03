@@ -27,3 +27,5 @@ experiment
 # Output files
 *.csv
 *.png
+
+*.cache
