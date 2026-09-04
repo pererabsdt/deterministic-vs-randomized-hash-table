@@ -9,7 +9,7 @@ const std::string CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
 class DataGenerator {
 public:
     // Generates a dataset of random alphanumeric strings
-    static std::vector<std::string> generateBenignData(size_t size, size_t length);
+    static void generateBenignData(size_t size, size_t length);
     
     // Generates an adversarial dataset mathematically crafted to collide on V1
     // Number of elements generated will be 2^pairs.

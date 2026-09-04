@@ -1,16 +1,18 @@
 #include "data/DataGenerator.h"
+#include <rapidcsv.h>
 #include <random>
 #include <string>
 
-std::vector<std::string> DataGenerator::generateBenignData(size_t size, size_t length) {
+void DataGenerator::generateBenignData(size_t size, size_t length) {
     std::vector<std::string> dataset;
+    dataset.reserve(size);
     // Random alphanumeric string generation
     
     std::random_device rd;
-    std::mt19937 generator(rd());
-    
+    std::mt19937 generator(rd());    
     std::uniform_int_distribution<> distribution(0, CHARACTERS.size() -1);
     
+    // Generating random strings
     for(size_t i = 0 ; i< size;i++){
         std::string random_string;
         random_string.reserve(length);
@@ -19,7 +21,12 @@ std::vector<std::string> DataGenerator::generateBenignData(size_t size, size_t l
         }
         dataset.push_back(random_string);
     }
-    return dataset;
+
+    // Saving random strings to .csv file
+    const std::string outputPath = "alph_num.csv";
+    rapidcsv::Document doc("", rapidcsv::LabelParams(-1, -1)); // No headers / row labels
+    doc.SetColumn(0, dataset);
+    doc.Save(outputPath);
 }
 
  std::vector<std::string> DataGenerator::generateAdversarialData(size_t numPairs) {
