@@ -23,9 +23,10 @@ void DataGenerator::generateBenignData(size_t size, size_t length) {
     }
 
     // Saving random strings to .csv file
-    rapidcsv::Document doc("", rapidcsv::LabelParams(-1,-1)); // No headers/ row labels
+    const std::string outputPath = "alph_num.csv";
+    rapidcsv::Document doc("", rapidcsv::LabelParams(-1, -1)); // No headers / row labels
     doc.SetColumn(0, dataset);
-    doc.Save("alph_num.csv");
+    doc.Save(outputPath);
 }
 
  std::vector<std::string> DataGenerator::generateAdversarialData(size_t numPairs) {
