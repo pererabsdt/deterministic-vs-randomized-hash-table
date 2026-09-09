@@ -12,4 +12,5 @@ endif()
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(experiment ${SOURCES})
-target_include_directories(experiment PRIVATE src)
+target_include_directories(experiment PRIVATE src
+                                                src/lib/rapidcsv-9.07/src)
