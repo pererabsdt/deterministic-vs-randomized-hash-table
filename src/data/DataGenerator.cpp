@@ -31,6 +31,31 @@ void DataGenerator::generateBenignData(size_t size, size_t length) {
 
  std::vector<std::string> DataGenerator::generateAdversarialData(size_t numPairs) {
     std::vector<std::string> dataset;
-    // TODO: Implement Meet-in-the-Middle combinatorial string generation
+    
+    // For V1, Hash(s) = (...(s[0]*31 + s[1])*31 + s[2]...)
+    // Two strings with the exact same polynomial evaluation: "Aa" and "BB"
+    // 'A' (65) * 31 + 'a' (97) = 2015 + 97 = 2112
+    // 'B' (66) * 31 + 'B' (66) = 2046 + 66 = 2112
+    // By generating all combinations of these two chunks, we get 2^numPairs strings
+    // that are mathematically guaranteed to have the same exact hash in V1.
+    std::string s1 = "Aa";
+    std::string s2 = "BB";
+    
+    size_t totalElements = 1ULL << numPairs; // 2^numPairs
+    dataset.reserve(totalElements);
+    
+    for (size_t i = 0; i < totalElements; ++i) {
+        std::string s;
+        s.reserve(numPairs * 2);
+        for (size_t bit = 0; bit < numPairs; ++bit) {
+            if ((i >> bit) & 1) {
+                s += s2;
+            } else {
+                s += s1;
+            }
+        }
+        dataset.push_back(s);
+    }
+    
     return dataset;
 }
