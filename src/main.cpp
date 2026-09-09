@@ -1,25 +1,87 @@
-#include "hash/HashTableV1.h"
-#include "hash/HashTableV2.h"
 #include "data/DataGenerator.h"
 #include "benchmark/Benchmark.h"
+#include "lib/rapidcsv-9.07/rapidcsv.h"
 #include <iostream>
+#include <vector>
+#include <algorithm>
+#include <random>
 
 int main() {
-    std::cout << "Environment setup successful! Ready for development.\n";
+    std::cout << "Starting Hash Table Security & Performance Analysis...\n";
 
-
-    // Basic instantiation to ensure linking works
-    HashTableV1 ht1(10);
-    HashTableV2 ht2(10);
-
-    // Generate 50k random alphanumeric strings of length 16
-    // Save them to "alph_num.csv"
-    size_t count = 50000;
-    size_t length = 16;
-
-    DataGenerator::generateBenignData(count,length);
+    const size_t TABLE_SIZE = 100003; // Prime table size
+    const size_t NUM_PAIRS = 16; // 2^16 = 65536 adversarial strings
+    const size_t LOOKUP_SIZE = 1000;
     
-    std::cout << "Hash tables linked successfully.\n";
+    // 1. Generate benign data using teammate's implementation (writes to alph_num.csv)
+    // We adjust count and length to match the adversarial payload for a fair comparison
+    size_t count = 1ULL << NUM_PAIRS; 
+    size_t length = 32;
+    std::cout << "Generating benign dataset (N = " << count << ")...\n";
+    DataGenerator::generateBenignData(count, length);
     
+    // 2. Load benign data from the CSV file back into memory
+    std::vector<std::string> benignData;
+    try {
+        rapidcsv::Document doc("alph_num.csv", rapidcsv::LabelParams(-1, -1));
+        benignData = doc.GetColumn<std::string>(0);
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to load alph_num.csv: " << e.what() << "\n";
+        return 1;
+    }
+    
+    // 3. Generate adversarial data
+    std::cout << "Generating adversarial dataset (N = " << (1ULL << NUM_PAIRS) << ")...\n";
+    auto adversarialData = DataGenerator::generateAdversarialData(NUM_PAIRS);
+    
+    // 4. Select 1000 random elements for lookup from each dataset
+    std::vector<std::string> benignLookupKeys;
+    std::vector<std::string> adversarialLookupKeys;
+    
+    std::sample(benignData.begin(), benignData.end(), std::back_inserter(benignLookupKeys),
+                LOOKUP_SIZE, std::mt19937{std::random_device{}()});
+                
+    std::sample(adversarialData.begin(), adversarialData.end(), std::back_inserter(adversarialLookupKeys),
+                LOOKUP_SIZE, std::mt19937{std::random_device{}()});
+
+    std::vector<BenchmarkResult> results;
+
+    // 5. Run Benchmarks on both datasets for V1
+    std::cout << "\n--- Running V1 (Deterministic Karp-Rabin) ---\n";
+    results.push_back(Benchmark::runV1("V1_Benign", benignData, TABLE_SIZE, benignLookupKeys));
+    std::cout << "V1 Benign - Max Chain Length: " << results.back().maxChainLength << "\n";
+    
+    results.push_back(Benchmark::runV1("V1_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys));
+    std::cout << "V1 Adversarial - Max Chain Length: " << results.back().maxChainLength << " (Expected ~65536)\n";
+
+    // 6. Run Benchmarks on both datasets for V2
+    std::cout << "\n--- Running V2 (Randomized Universal Hashing) ---\n";
+    results.push_back(Benchmark::runV2("V2_Benign", benignData, TABLE_SIZE, benignLookupKeys));
+    std::cout << "V2 Benign - Max Chain Length: " << results.back().maxChainLength << "\n";
+    
+    results.push_back(Benchmark::runV2("V2_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys));
+    std::cout << "V2 Adversarial - Max Chain Length: " << results.back().maxChainLength << "\n";
+
+    // 7. Asymptotic Degradation testing (Running with different N to plot O(1) vs O(n))
+    std::cout << "\n--- Running Asymptotic Degradation Tests ---\n";
+    std::vector<size_t> sizes = {10000, 20000, 30000, 40000, 50000, 60000};
+    
+    for (size_t n : sizes) {
+        if (n > adversarialData.size()) continue;
+        
+        std::vector<std::string> subset(adversarialData.begin(), adversarialData.begin() + n);
+        
+        std::vector<std::string> lookupSubset;
+        std::sample(subset.begin(), subset.end(), std::back_inserter(lookupSubset),
+                    std::min(n, LOOKUP_SIZE), std::mt19937{std::random_device{}()});
+                    
+        results.push_back(Benchmark::runV1("V1_Degradation", subset, TABLE_SIZE, lookupSubset));
+        results.push_back(Benchmark::runV2("V2_Degradation", subset, TABLE_SIZE, lookupSubset));
+    }
+
+    std::cout << "\nSaving results to benchmark_results.csv...\n";
+    Benchmark::saveToCSV(results, "benchmark_results.csv");
+    
+    std::cout << "Experiment completed successfully!\n";
     return 0;
 }
