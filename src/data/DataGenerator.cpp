@@ -59,3 +59,50 @@ void DataGenerator::generateBenignData(size_t size, size_t length) {
     
     return dataset;
 }
+
+std::vector<std::string> DataGenerator::generateAvalanchData(
+    size_t size,
+    std::string seed
+) {
+    std::vector<std::string> dataset;
+    if (seed.empty() || size == 0) return dataset;
+
+    dataset.reserve(size);
+
+    const size_t seed_len = seed.length();
+    const auto char_count = static_cast<ssize_t>(CHARACTERS_SIZE);
+
+    // Track original character positions as signed integers
+    std::vector<ssize_t> indexes(seed_len);
+    for (size_t j = 0; j < seed_len; j++) {
+        size_t pos = CHARACTERS.find(seed[j]);
+        indexes[j] = (pos != std::string::npos) ? static_cast<ssize_t>(pos) : 0;
+    }
+
+    std::string new_string = seed;
+    size_t idx = 0;
+    int direction = 1;  // +1 = right, -1 = left
+
+    for (size_t i = 0; i < size; i++) {
+        // Modify current position using safe modulo arithmetic
+        indexes[idx] = (indexes[idx] + direction + char_count) % char_count;
+        new_string[idx] = CHARACTERS[indexes[idx]];
+
+        dataset.push_back(new_string);
+
+        // Ping-pong boundary checking
+        if (seed_len > 1) {
+            if (direction == 1 && idx == seed_len - 1) {
+                direction = -1;
+                idx--;
+            } else if (direction == -1 && idx == 0) {
+                direction = 1;
+                idx++;
+            } else {
+                idx += direction;
+            }
+        }
+    }
+
+    return dataset;
+}

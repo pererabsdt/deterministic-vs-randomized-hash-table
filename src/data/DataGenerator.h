@@ -5,6 +5,7 @@
 #include <string>
 
 const std::string CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const std::size_t CHARACTERS_SIZE = CHARACTERS.size();
 
 class DataGenerator {
 public:
@@ -15,6 +16,8 @@ public:
     // Number of elements generated will be 2^pairs.
     // e.g. 16 pairs = 65536 strings.
     static std::vector<std::string> generateAdversarialData(size_t numPairs);
+
+    static std::vector<std::string> generateAvalanchData(size_t size, std::string seed);
 };
 
 #endif // DATA_GENERATOR_H
