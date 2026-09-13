@@ -10,7 +10,7 @@ int main() {
     std::cout << "Starting Hash Table Security & Performance Analysis...\n";
 
     const size_t TABLE_SIZE = 100003; // Prime table size
-    const size_t NUM_PAIRS = 16; // 2^16 = 65536 adversarial strings
+    const size_t NUM_PAIRS = 17; // 2^17 = 131072 adversarial strings
     const size_t LOOKUP_SIZE = 1000;
     
     // 1. Generate benign data  (writes to alph_num.csv)
@@ -64,7 +64,7 @@ int main() {
 
     // 7. Asymptotic Degradation testing (Running with different N to plot O(1) vs O(n))
     std::cout << "\n--- Running Asymptotic Degradation Tests ---\n";
-    std::vector<size_t> sizes = {10000, 20000, 30000, 40000, 50000, 60000};
+    std::vector<size_t> sizes = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
     
     for (size_t n : sizes) {
         if (n > adversarialData.size()) continue;
