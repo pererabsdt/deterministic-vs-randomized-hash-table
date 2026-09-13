@@ -1,5 +1,6 @@
 #include "data/DataGenerator.h"
 #include "../lib/rapidcsv-9.07/rapidcsv.h"
+#include <cstddef>
 #include <random>
 #include <string>
 
@@ -76,7 +77,7 @@ std::vector<std::string> DataGenerator::generateAvalancheData(
     std::vector<long long> indexes(seed_len);
     for (size_t j = 0; j < seed_len; j++) {
         size_t pos = CHARACTERS.find(seed[j]);
-        indexes[j] = (pos != std::string::npos) ? static_cast<ssize_t>(pos) : 0;
+        indexes[j] = (pos != std::string::npos) ? static_cast<std::ptrdiff_t>(pos) : 0;
     }
 
     std::string new_string = seed;
