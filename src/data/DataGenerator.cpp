@@ -60,7 +60,7 @@ void DataGenerator::generateBenignData(size_t size, size_t length) {
     return dataset;
 }
 
-std::vector<std::string> DataGenerator::generateAvalanchData(
+std::vector<std::string> DataGenerator::generateAvalancheData(
     size_t size,
     std::string seed
 ) {

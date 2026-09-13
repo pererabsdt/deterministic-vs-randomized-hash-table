@@ -17,7 +17,7 @@ public:
     // e.g. 16 pairs = 65536 strings.
     static std::vector<std::string> generateAdversarialData(size_t numPairs);
 
-    static std::vector<std::string> generateAvalanchData(size_t size, std::string seed);
+    static std::vector<std::string> generateAvalancheData(size_t size, std::string seed);
 };
 
 #endif // DATA_GENERATOR_H
