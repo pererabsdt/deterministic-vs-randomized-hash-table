@@ -70,10 +70,10 @@ std::vector<std::string> DataGenerator::generateAvalanchData(
     dataset.reserve(size);
 
     const size_t seed_len = seed.length();
-    const auto char_count = static_cast<ssize_t>(CHARACTERS_SIZE);
+    const auto char_count = static_cast<long long>(CHARACTERS_SIZE);
 
     // Track original character positions as signed integers
-    std::vector<ssize_t> indexes(seed_len);
+    std::vector<long long> indexes(seed_len);
     for (size_t j = 0; j < seed_len; j++) {
         size_t pos = CHARACTERS.find(seed[j]);
         indexes[j] = (pos != std::string::npos) ? static_cast<ssize_t>(pos) : 0;
