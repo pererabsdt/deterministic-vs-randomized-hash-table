@@ -13,13 +13,14 @@ struct BenchmarkResult {
     size_t dataSize;
     double insertTimeMs;
     double lookupTimeMs; // time for 1000 lookups
+    double deleteTimeMs; // time for deletion
     size_t maxChainLength;
 };
 
 class Benchmark {
 public:
-    static BenchmarkResult runV1(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys);
-    static BenchmarkResult runV2(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys);
+    static BenchmarkResult runV1(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys, const std::vector<std::string>& deleteKeys);
+    static BenchmarkResult runV2(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys, const std::vector<std::string>& deleteKeys);
     
     static void saveToCSV(const std::vector<BenchmarkResult>& results, const std::string& filename);
 };

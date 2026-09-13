@@ -52,6 +52,19 @@ bool HashTableV2::lookup(const std::string& key) const {
     return false;
 }
 
+bool HashTableV2::remove(const std::string& key) {
+    uint64_t index = hashFunction(key);
+    auto& chain = table[index];
+    for (auto it = chain.begin(); it != chain.end(); ++it) {
+        if (*it == key) {
+            chain.erase(it);
+            numElements--;
+            return true;
+        }
+    }
+    return false;
+}
+
 size_t HashTableV2::getMaxChainLength() const {
     size_t maxLength = 0;
     for (const auto& chain : table) {

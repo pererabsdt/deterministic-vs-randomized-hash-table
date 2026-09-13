@@ -13,7 +13,7 @@ int main() {
     const size_t NUM_PAIRS = 16; // 2^16 = 65536 adversarial strings
     const size_t LOOKUP_SIZE = 1000;
     
-    // 1. Generate benign data using teammate's implementation (writes to alph_num.csv)
+    // 1. Generate benign data  (writes to alph_num.csv)
     // We adjust count and length to match the adversarial payload for a fair comparison
     size_t count = 1ULL << NUM_PAIRS; 
     size_t length = 32;
@@ -48,18 +48,18 @@ int main() {
 
     // 5. Run Benchmarks on both datasets for V1
     std::cout << "\n--- Running V1 (Deterministic Karp-Rabin) ---\n";
-    results.push_back(Benchmark::runV1("V1_Benign", benignData, TABLE_SIZE, benignLookupKeys));
+    results.push_back(Benchmark::runV1("V1_Benign", benignData, TABLE_SIZE, benignLookupKeys, benignLookupKeys));
     std::cout << "V1 Benign - Max Chain Length: " << results.back().maxChainLength << "\n";
     
-    results.push_back(Benchmark::runV1("V1_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys));
+    results.push_back(Benchmark::runV1("V1_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys, adversarialLookupKeys));
     std::cout << "V1 Adversarial - Max Chain Length: " << results.back().maxChainLength << " (Expected ~65536)\n";
 
     // 6. Run Benchmarks on both datasets for V2
     std::cout << "\n--- Running V2 (Randomized Universal Hashing) ---\n";
-    results.push_back(Benchmark::runV2("V2_Benign", benignData, TABLE_SIZE, benignLookupKeys));
+    results.push_back(Benchmark::runV2("V2_Benign", benignData, TABLE_SIZE, benignLookupKeys, benignLookupKeys));
     std::cout << "V2 Benign - Max Chain Length: " << results.back().maxChainLength << "\n";
     
-    results.push_back(Benchmark::runV2("V2_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys));
+    results.push_back(Benchmark::runV2("V2_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys, adversarialLookupKeys));
     std::cout << "V2 Adversarial - Max Chain Length: " << results.back().maxChainLength << "\n";
 
     // 7. Asymptotic Degradation testing (Running with different N to plot O(1) vs O(n))
@@ -75,8 +75,8 @@ int main() {
         std::sample(subset.begin(), subset.end(), std::back_inserter(lookupSubset),
                     std::min(n, LOOKUP_SIZE), std::mt19937{std::random_device{}()});
                     
-        results.push_back(Benchmark::runV1("V1_Degradation", subset, TABLE_SIZE, lookupSubset));
-        results.push_back(Benchmark::runV2("V2_Degradation", subset, TABLE_SIZE, lookupSubset));
+        results.push_back(Benchmark::runV1("V1_Degradation", subset, TABLE_SIZE, lookupSubset, lookupSubset));
+        results.push_back(Benchmark::runV2("V2_Degradation", subset, TABLE_SIZE, lookupSubset, lookupSubset));
     }
 
     std::cout << "\nSaving results to benchmark_results.csv...\n";

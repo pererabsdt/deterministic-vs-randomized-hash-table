@@ -7,7 +7,7 @@
 
 using namespace std::chrono;
 
-BenchmarkResult Benchmark::runV1(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys) {
+BenchmarkResult Benchmark::runV1(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys, const std::vector<std::string>& deleteKeys) {
     HashTableV1 ht(tableSize);
     
     // Measure insertion
@@ -26,10 +26,18 @@ BenchmarkResult Benchmark::runV1(const std::string& testName, const std::vector<
     auto endLookup = high_resolution_clock::now();
     double lookupTime = duration_cast<duration<double, std::milli>>(endLookup - startLookup).count();
     
-    return {testName, tableSize, dataset.size(), insertTime, lookupTime, ht.getMaxChainLength()};
+    // Measure deletion
+    auto startDelete = high_resolution_clock::now();
+    for (const auto& key : deleteKeys) {
+        ht.remove(key);
+    }
+    auto endDelete = high_resolution_clock::now();
+    double deleteTime = duration_cast<duration<double, std::milli>>(endDelete - startDelete).count();
+    
+    return {testName, tableSize, dataset.size(), insertTime, lookupTime, deleteTime, ht.getMaxChainLength()};
 }
 
-BenchmarkResult Benchmark::runV2(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys) {
+BenchmarkResult Benchmark::runV2(const std::string& testName, const std::vector<std::string>& dataset, size_t tableSize, const std::vector<std::string>& lookupKeys, const std::vector<std::string>& deleteKeys) {
     HashTableV2 ht(tableSize);
     
     // Measure insertion
@@ -48,7 +56,15 @@ BenchmarkResult Benchmark::runV2(const std::string& testName, const std::vector<
     auto endLookup = high_resolution_clock::now();
     double lookupTime = duration_cast<duration<double, std::milli>>(endLookup - startLookup).count();
     
-    return {testName, tableSize, dataset.size(), insertTime, lookupTime, ht.getMaxChainLength()};
+    // Measure deletion
+    auto startDelete = high_resolution_clock::now();
+    for (const auto& key : deleteKeys) {
+        ht.remove(key);
+    }
+    auto endDelete = high_resolution_clock::now();
+    double deleteTime = duration_cast<duration<double, std::milli>>(endDelete - startDelete).count();
+    
+    return {testName, tableSize, dataset.size(), insertTime, lookupTime, deleteTime, ht.getMaxChainLength()};
 }
 
 void Benchmark::saveToCSV(const std::vector<BenchmarkResult>& results, const std::string& filename) {
@@ -58,13 +74,14 @@ void Benchmark::saveToCSV(const std::vector<BenchmarkResult>& results, const std
         return;
     }
     
-    file << "TestName,TableSize,DataSize,InsertTimeMs,LookupTimeMs,MaxChainLength\n";
+    file << "TestName,TableSize,DataSize,InsertTimeMs,LookupTimeMs,DeleteTimeMs,MaxChainLength\n";
     for (const auto& r : results) {
         file << r.testName << "," 
              << r.tableSize << "," 
              << r.dataSize << "," 
              << r.insertTimeMs << "," 
              << r.lookupTimeMs << "," 
+             << r.deleteTimeMs << "," 
              << r.maxChainLength << "\n";
     }
     

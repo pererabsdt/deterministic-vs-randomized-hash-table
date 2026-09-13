@@ -25,6 +25,7 @@ public:
     uint64_t hashFunction(const std::string& key) const;
     void insert(const std::string& key);
     bool lookup(const std::string& key) const;
+    bool remove(const std::string& key);
     
     size_t getMaxChainLength() const;
     size_t getTableSize() const { return table.size(); }
