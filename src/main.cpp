@@ -12,6 +12,8 @@ int main() {
     const size_t TABLE_SIZE = 100003; // Prime table size
     const size_t NUM_PAIRS = 17; // 2^17 = 131072 adversarial strings
     const size_t LOOKUP_SIZE = 1000;
+
+    const std::string AVALANCHE_SEED = "HelloWorld";
     
     // 1. Generate benign data  (writes to alph_num.csv)
     // We adjust count and length to match the adversarial payload for a fair comparison
@@ -33,10 +35,18 @@ int main() {
     // 3. Generate adversarial data
     std::cout << "Generating adversarial dataset (N = " << (1ULL << NUM_PAIRS) << ")...\n";
     auto adversarialData = DataGenerator::generateAdversarialData(NUM_PAIRS);
-    
-    // 4. Select 1000 random elements for lookup from each dataset
+   
+    // 4. Generate avalancheData
+    std::cout <<"Generating avalanch dataset (N = "<< (1ULL << NUM_PAIRS) <<")...\n";
+    std::vector<std::string> avalancheData =  DataGenerator::generateAvalancheData(
+        NUM_PAIRS,
+        AVALANCHE_SEED 
+    );
+
+    // 5. Select 1000 random elements for lookup from each dataset
     std::vector<std::string> benignLookupKeys;
     std::vector<std::string> adversarialLookupKeys;
+    std::vector<std::string> avalancheLookupKeys;
     
     std::sample(benignData.begin(), benignData.end(), std::back_inserter(benignLookupKeys),
                 LOOKUP_SIZE, std::mt19937{std::random_device{}()});
@@ -44,9 +54,13 @@ int main() {
     std::sample(adversarialData.begin(), adversarialData.end(), std::back_inserter(adversarialLookupKeys),
                 LOOKUP_SIZE, std::mt19937{std::random_device{}()});
 
+    std::sample(avalancheData.begin(), avalancheData.end(), std::back_inserter(avalancheLookupKeys),
+        LOOKUP_SIZE, std::mt19937(std::random_device{}())
+    );
+
     std::vector<BenchmarkResult> results;
 
-    // 5. Run Benchmarks on both datasets for V1
+    // 6. Run Benchmarks on both datasets for V1
     std::cout << "\n--- Running V1 (Deterministic Karp-Rabin) ---\n";
     results.push_back(Benchmark::runV1("V1_Benign", benignData, TABLE_SIZE, benignLookupKeys, benignLookupKeys));
     std::cout << "V1 Benign - Max Chain Length: " << results.back().maxChainLength << "\n";
@@ -54,7 +68,10 @@ int main() {
     results.push_back(Benchmark::runV1("V1_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys, adversarialLookupKeys));
     std::cout << "V1 Adversarial - Max Chain Length: " << results.back().maxChainLength << " (Expected ~65536)\n";
 
-    // 6. Run Benchmarks on both datasets for V2
+    results.push_back(Benchmark::runV1("V1_avalanche",avalancheData,TABLE_SIZE,avalancheLookupKeys, avalancheLookupKeys));
+    std::cout << "V1 Avalanche - Max Chain Length: " << results.back().maxChainLength << "\n";
+
+    // 7. Run Benchmarks on both datasets for V2
     std::cout << "\n--- Running V2 (Randomized Universal Hashing) ---\n";
     results.push_back(Benchmark::runV2("V2_Benign", benignData, TABLE_SIZE, benignLookupKeys, benignLookupKeys));
     std::cout << "V2 Benign - Max Chain Length: " << results.back().maxChainLength << "\n";
@@ -62,6 +79,9 @@ int main() {
     results.push_back(Benchmark::runV2("V2_Adversarial", adversarialData, TABLE_SIZE, adversarialLookupKeys, adversarialLookupKeys));
     std::cout << "V2 Adversarial - Max Chain Length: " << results.back().maxChainLength << "\n";
 
+    results.push_back(Benchmark::runV2("V2_Avalanche",avalancheData, TABLE_SIZE, avalancheLookupKeys, avalancheLookupKeys));
+    std::cout << "V2 Avalanche - Max Chain Length: " << results.back().maxChainLength << "\n";
+    
     // 7. Asymptotic Degradation testing (Running with different N to plot O(1) vs O(n))
     std::cout << "\n--- Running Asymptotic Degradation Tests ---\n";
     std::vector<size_t> sizes = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
