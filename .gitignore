@@ -29,3 +29,5 @@ experiment
 *.png
 
 *.cache
+
+venv

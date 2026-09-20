@@ -39,7 +39,7 @@ int main() {
     // 4. Generate avalancheData
     std::cout <<"Generating avalanch dataset (N = "<< (1ULL << NUM_PAIRS) <<")...\n";
     std::vector<std::string> avalancheData =  DataGenerator::generateAvalancheData(
-        NUM_PAIRS,
+        1ULL << NUM_PAIRS,
         AVALANCHE_SEED 
     );
 
